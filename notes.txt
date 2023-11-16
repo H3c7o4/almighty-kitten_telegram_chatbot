@@ -1,0 +1,5 @@
+To build image:
+ - docker build -t nom_de_votre_image .
+
+To launch the container:
+ - docker run -d --name nom_de_votre_conteneur -e PALM_API_KEY=your_palm_api_key -e TOKEN=your_bot_token -e JOKES_KEY=your_jokes_key nom_de_votre_image
