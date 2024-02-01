@@ -3,14 +3,20 @@
 from telegram import Update
 from telegram.ext import Application, CommandHandler, filters, MessageHandler, ContextTypes
 from typing import Final
-import google.generativeai as palm
+from openai import AsyncOpenAI
+import asyncio
 import requests
 import json
 import os
 
-palm_key = os.environ['PALM_API_KEY']
+palm_key: Final = os.environ['PALM_API_KEY']
 TOKEN: Final = os.environ['TOKEN']
-my_jokes_key = os.environ['JOKES_KEY']
+my_jokes_key: Final = os.environ['JOKES_KEY']
+openai_api_key: Final = os.environ["OPENAI_API_KEY"]
+
+client = AsyncOpenAI(
+            api_key= openai_api_key
+)
 
 BOT_USERNAME: Final = '@AlmightyKitten_bot'
 
@@ -49,20 +55,12 @@ def convert_currency(from_currency='USD', to_currency='Eur', amount=1):
     else:
         return None
 
-def get_answer(query):
-    palm.configure(api_key=palm_key)
-    models = [m for m in palm.list_models() if 'generateText' in m.supported_generation_methods]
-    model = models[0].name
-    prompt = "You're a chatbot that answers questions. Your name is Almighty Kitten. Act like a kitten when answering questions\n\n" + query
+async def get_answer(query):
+    messages = [{"role": "system", "content": "You're a chatbot that answers questions. Your name is Almighty Kitten the funniest cat in the world. You have been created by Hector Steve ITOK, a wonderful Devops engineer. Act like a kitten when answering questions."}]
+    messages.append({"role": "user", "content": query})
+    answers = await client.chat.completions.create(model="gpt-3.5-turbo", messages=messages)
 
-    completion = palm.generate_text(
-        model=model,
-        prompt=prompt,
-        temperature=0,
-        # The maximum length of the response
-        max_output_tokens=800,
-    )
-    return completion.result
+    return answers.choices[0].message.content
 
 async def start_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text(
@@ -105,11 +103,11 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if message_type == 'group':
         if BOT_USERNAME in text:
             new_text: str = text.replace(BOT_USERNAME, '').strip()
-            response: str = get_answer(new_text)
+            response: str = await get_answer(new_text)
         else:
             return
     else:
-        response: str = get_answer(text)
+        response: str = await get_answer(text)
     print('Bot: ', response)
     await update.message.reply_text(response)
 
