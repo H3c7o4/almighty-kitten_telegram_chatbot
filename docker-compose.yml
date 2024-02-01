@@ -1,0 +1,10 @@
+version: '3.0'
+services:
+  telegram-bot:
+    image: h3c7o4/almighty_kitten:1.0.4
+    environment:
+      - PALM_API_KEY=AIzaSyDMvV7Z51bTF9_hX5PqsSA012084shkaTg
+      - TOKEN=6386130297:AAFRIYiv8__ZGsrlt9tOjGk4M3pH9wLB1lg
+      - JOKES_KEY=9/IYHFIpcgLxxByimjkNoA==UlTMbToOhh9cYbAW
+      - OPENAI_API_KEY=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
+    restart: always

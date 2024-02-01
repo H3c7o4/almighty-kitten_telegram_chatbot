@@ -14,7 +14,7 @@ WORKDIR /app
 
 # Installation des dépendances Python
 RUN pip install --upgrade pip
-RUN pip install python-telegram-bot google requests
+RUN pip install python-telegram-bot google-generativeai requests
 
 # Commande par défaut à exécuter lors du démarrage du conteneur
 CMD ["python3", "main.py"]
